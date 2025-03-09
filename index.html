@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Sensor Data</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007BFF;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2> Live Sensor Data Dashboard </h2>
+
+    <div class="card">
+        <h3> Temperature</h3>
+        <p class="value" id="temperature">-- °C</p>
+    </div>
+
+    <div class="card">
+        <h3> Humidity</h3>
+        <p class="value" id="humidity">-- %</p>
+    </div>
+
+    <div class="card">
+        <h3> Light Level</h3>
+        <p class="value" id="light">--</p>
+    </div>
+
+       <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyCh6PVvcv663WHMW_TYNGgr4-0UDdSWXuk",
+  authDomain: "aaron-1dd23.firebaseapp.com",
+  projectId: "aaron-1dd23",
+  storageBucket: "aaron-1dd23.firebasestorage.app",
+  messagingSenderId: "1021018581008",
+  appId: "1:1021018581008:web:a9ba39ed3af28a41ab0295",
+  measurementId: "G-VV67YGM1WG"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function fetchSensorData() {
+        const q = query(collection(db, "act4"), orderBy("timestamp", "desc"), limit(1));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const doc = querySnapshot.docs[0];
+            const data = doc.data();
+
+            console.log("Fetched Data:", data);
+
+            document.getElementById("temperature").innerText = data.temperature + " °C";
+            document.getElementById("humidity").innerText = data.humidity + " %";
+            document.getElementById("light").innerText = data.light_level;
+        } else {
+            console.log("No sensor data found.");
+        }
+    }
+
+    setInterval(fetchSensorData, 3000);
+    fetchSensorData();
+</script>
+
+
+</body>
+
+</html>
